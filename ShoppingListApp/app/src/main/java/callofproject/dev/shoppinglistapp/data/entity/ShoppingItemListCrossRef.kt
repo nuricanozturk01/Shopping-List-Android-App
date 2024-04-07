@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.data.entity.ref
+package callofproject.dev.shoppinglistapp.data.entity
 
 import androidx.room.Entity
 

@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.presentation.shopping_item
+package callofproject.dev.shoppinglistapp.presentation.shopping_list
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,13 +25,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageViewModel
 
 
 @Composable
-fun MinimalDialog(onDismissRequest: () -> Unit) {
-    var itemName by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+fun CreateListScreen(
+    viewModel: MainPageViewModel = hiltViewModel(),
+    onDismissRequest: () -> Unit = {}
+) {
+    var listName by remember { mutableStateOf("") }
+    val state = viewModel.state
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -44,30 +48,17 @@ fun MinimalDialog(onDismissRequest: () -> Unit) {
                 modifier = Modifier.padding(15.dp)
             ) {
                 Text(
-                    text = "Ürün Ekle",
+                    text = "Liste Ekle",
                     style = TextStyle(
                         fontSize = 20.sp, fontWeight = FontWeight(600),
                         color = MaterialTheme.colorScheme.primary
                     )
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Ürün Adı") },
-                    value = itemName,
-                    onValueChange = { itemName = it })
+                    label = { Text(text = "Liste Adı") },
+                    value = listName,
+                    onValueChange = { listName = it })
 
-                Spacer(modifier = Modifier.height(10.dp))
-
-                OutlinedTextField(
-                    label = { Text(text = "Miktar") },
-                    value = amount,
-                    onValueChange = { amount = it })
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                OutlinedTextField(
-                    label = { Text(text = "Birim Fiyat") },
-                    value = price,
-                    onValueChange = { price = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -80,7 +71,10 @@ fun MinimalDialog(onDismissRequest: () -> Unit) {
                         Text(text = "İptal")
                     }
 
-                    OutlinedButton(onClick = { onDismissRequest() }) {
+                    OutlinedButton(onClick = {
+                        viewModel.onEvent(ShoppingListEvent.OnClickSaveListBtn(listName))
+                        onDismissRequest()
+                    }) {
                         Text(text = "Kaydet")
                     }
                 }

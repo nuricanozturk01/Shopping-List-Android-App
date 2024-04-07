@@ -1,5 +1,6 @@
 package callofproject.dev.shoppinglistapp.data.dal
 
+import android.util.Log
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
 import callofproject.dev.shoppinglistapp.data.mapper.toShoppingItem
@@ -10,6 +11,8 @@ import callofproject.dev.shoppinglistapp.domain.dao.IShoppingListDao
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemDTO
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingListDTO
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -21,24 +24,24 @@ class ShoppingListServiceHelper @Inject constructor(
     private val dateTime: LocalDateTime
 ) {
 
-    fun createShoppingList(listName: String?): ShoppingListDTO? {
+    suspend fun createShoppingList(listName: String?) {
         try {
             if (listName == null) {
                 val shoppingList =
                     ShoppingList(listName = "UNKNOWN LIST-${formatter.format(dateTime)}")
 
-                return findShoppingListById(mShoppingListDao.save(shoppingList))?.toShoppingListDTO()
+                mShoppingListDao.save(shoppingList)
             }
 
-            return findShoppingListById(mShoppingListDao.save(ShoppingList(listName = listName)))?.toShoppingListDTO()
-
+            mShoppingListDao.save(ShoppingList(listName = listName!!))
+            Log.i("SUCCESS_SAVE", "YES")
         } catch (ignore: Exception) {
-            return null
+            Log.e("SAVE:ERROR", ignore.message!!)
         }
     }
 
 
-    fun createShoppingItem(item: ShoppingItemCreateDTO): ShoppingItemDTO? {
+    suspend fun createShoppingItem(item: ShoppingItemCreateDTO): ShoppingItemDTO? {
         return try {
             findShoppingItemById(mItemDao.save(item.toShoppingItem()))?.toShoppingItemDTO()
         } catch (ignore: Exception) {
@@ -46,7 +49,7 @@ class ShoppingListServiceHelper @Inject constructor(
         }
     }
 
-    private fun findShoppingItemById(id: Long): ShoppingItem? {
+    private suspend fun findShoppingItemById(id: Long): ShoppingItem? {
         return try {
             mItemDao.findById(id)
         } catch (ignore: Exception) {
@@ -54,7 +57,7 @@ class ShoppingListServiceHelper @Inject constructor(
         }
     }
 
-    private fun findShoppingListById(id: Long): ShoppingList? {
+    private suspend fun findShoppingListById(id: Long): ShoppingList? {
         return try {
             mShoppingListDao.findById(id)
         } catch (ignore: Exception) {
@@ -62,8 +65,17 @@ class ShoppingListServiceHelper @Inject constructor(
         }
     }
 
+    suspend fun findAllShoppingLists(): List<ShoppingList> {
+        return try {
+            mShoppingListDao.findAll()
+        } catch (ignored: Exception) {
+            emptyList()
+        }
 
-    fun removeShoppingItemById(id: Long): Boolean {
+    }
+
+
+    suspend fun removeShoppingItemById(id: Long): Boolean {
         return try {
             val item = mItemDao.findById(id)
             if (item != null) {

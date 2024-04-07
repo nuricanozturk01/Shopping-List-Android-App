@@ -3,13 +3,13 @@
     <string name="date_time_formatter">dd/MM/yyyy</string>
     <string name="default_title">Shopping List Application</string>
     <string name="descriptor_image_menu">menu image</string>
-    <string name="item_amount">Amount</string>
-    <string name="unit_price">Price</string>
-    <string name="total_price">Total</string>
+    <string name="item_amount">Miktar</string>
+    <string name="unit_price">Fiyat</string>
+    <string name="total_price">Toplam</string>
     <string name="times">x</string>
-    <string name="money_tl">₺ (TL)</string>
-    <string name="money_euro">£ (EUR)</string>
-    <string name="money_dollar">$ (USD)</string>
+    <string name="money_tl">₺</string>
+    <string name="money_euro">£</string>
+    <string name="money_dollar">$</string>
     <string name="next">Next</string>
     <string name="influx_money">Para biriminizi seçin</string>
     <string name="list_not_found">Liste Bulunamadı</string>
@@ -20,7 +20,6 @@
     <string name="btn_save">Kaydet</string>
     <string name="btn_cancel">İptal</string>
     <string name="create_list_menu">Liste Ekle</string>
-
 
 
 </resources>

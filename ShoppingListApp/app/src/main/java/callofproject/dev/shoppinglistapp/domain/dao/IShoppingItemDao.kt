@@ -12,18 +12,18 @@ import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 interface IShoppingItemDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun save(item: ShoppingItem): Long
+    suspend fun save(item: ShoppingItem): Long
 
     @Delete
-    fun remove(item: ShoppingItem)
+    suspend fun remove(item: ShoppingItem)
 
     @Delete
-    fun removeAll(items: List<ShoppingItem>)
+    suspend fun removeAll(items: List<ShoppingItem>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(item: ShoppingItem)
+    suspend fun update(item: ShoppingItem)
 
 
     @Query("select * from shopping_item where itemId = :id")
-    fun findById(id: Long): ShoppingItem?
+    suspend fun findById(id: Long): ShoppingItem?
 }
