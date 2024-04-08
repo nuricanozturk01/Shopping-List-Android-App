@@ -9,7 +9,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -32,7 +35,7 @@ import callofproject.dev.shoppinglistapp.R
 
 
 @Composable
-fun CreateListScreen(
+fun ChangeLangScreen(
     confirmEvent: (String) -> Unit,
     title: String,
     onDismissRequest: () -> Unit = {},
@@ -58,6 +61,10 @@ fun CreateListScreen(
                         color = MaterialTheme.colorScheme.primary
                     )
                 )
+
+                IconButton(onClick = { /*TODO*/ }) {
+
+                }
                 OutlinedTextField(
                     label = { Text(text = stringResource(R.string.list_name)) },
                     value = listName,

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShoppingListApp</string>
+    <string name="date_time_formatter">dd/MM/yyyy kk:mm:ss</string>
+    <string name="default_title">Shopping List Application</string>
+    <string name="descriptor_image_menu">menu image</string>
+    <string name="item_amount">Amount</string>
+    <string name="item_name">Product Name</string>
+    <string name="price">Price</string>
+    <string name="unit_price">Unit Price</string>
+    <string name="total_price">Total</string>
+    <string name="times">x</string>
+    <string name="money_tl">₺</string>
+    <string name="money_euro">£</string>
+    <string name="money_dollar">$</string>
+    <string name="next">Next</string>
+    <string name="influx_money">Please choose the influx money</string>
+    <string name="list_not_found">List not found</string>
+    <string name="not_content">Please create a shopping list</string>
+
+    <string name="alert_dialog_create_list">Create Shopping List</string>
+    <string name="alert_dialog_create_list_body">Enter the name fro shopping list</string>
+    <string name="btn_save">Save</string>
+    <string name="btn_remove">Delete</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="create_list_menu">Add List</string>
+    <string name="create_item_menu">Add Prodcuct</string>
+    <string name="error_find_shopping_list">Occurred unexpected behaviour</string>
+    <string name="info_list_removed_succes">List removed successfully!</string>
+    <string name="info_list_removed_fail">Error occurred while removing the list</string>
+    <string name="msg_list_added">List Successfully Added!</string>
+    <string name="not_supported_operartion">Not supported on this page!</string>
+    <string name="edit_item_menu">Edit Product</string>
+    <string name="message_validate_str">Name length should not exceed 20 characters!</string>
+    <string name="confirm_dialog_title">Are you sure for the changes?</string>
+    <string name="confirm_dialog_text">Are you sure you want to delete?</string>
+    <string name="info_item_removed_succes">Product successfully deleted!</string>
+    <string name="msg_item_added">Product successfully added!</string>
+    <string name="msg_item_updated">Product successfully updated!</string>
+    <string name="msg_list_updated">List successfully updated!</string>
+    <string name="msg_item_removed">List successfully deleted!</string>
+    <string name="list_name">List Name</string>
+    <string name="edit_list">Edit List</string>
+    <string name="x_listed_item">listed different products</string>
+    <string name="change_lang">Language</string>
+
+</resources>

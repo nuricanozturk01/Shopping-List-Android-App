@@ -103,7 +103,7 @@ fun ShoppingListItem(
             }
 
             Text(
-                text = "${shoppingListItem.itemCount} farklı ürün listelendi",
+                text = "${shoppingListItem.itemCount} ${stringResource(R.string.x_listed_item)}",
                 style = MaterialTheme.typography.bodySmall,
                 overflow = TextOverflow.Ellipsis,
                 maxLines = 1,
@@ -144,7 +144,7 @@ fun ShoppingListItem(
         if (editScreenExpanded.value)
             CreateListScreen(
                 defaultValue = shoppingListItem.listName,
-                title = "Liste Düzenle",
+                title = stringResource(R.string.edit_list),
                 confirmEvent = {
                     viewModel.onEvent(MainPageEvent.OnEditShoppingListClick(shoppingListItem, it))
                 },

@@ -12,7 +12,7 @@
     <string name="money_tl">₺</string>
     <string name="money_euro">£</string>
     <string name="money_dollar">$</string>
-    <string name="next">Next</string>
+    <string name="next">İleri</string>
     <string name="influx_money">Para biriminizi seçin</string>
     <string name="list_not_found">Liste Bulunamadı</string>
     <string name="not_content">Lütfen menüden bir alışveriş listesi oluşturun</string>
@@ -38,6 +38,10 @@
     <string name="msg_item_updated">Ürün başarıyla güncellendi!</string>
     <string name="msg_list_updated">Liste başarıyla güncellendi!</string>
     <string name="msg_item_removed">Liste başarıyla silindi!</string>
+    <string name="list_name">Liste Adı</string>
+    <string name="edit_list">ListeDüzenle</string>
+    <string name="x_listed_item">farklı ürün listelendi</string>
+    <string name="change_lang">Dil</string>
 
 
 </resources>

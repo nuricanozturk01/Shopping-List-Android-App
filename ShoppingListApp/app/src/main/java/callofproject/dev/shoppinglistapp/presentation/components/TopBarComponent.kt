@@ -38,10 +38,14 @@ fun TopBarComponent(
     title: String = stringResource(R.string.default_title)
 ) {
 
-    val menuItems = listOf(stringResource(R.string.create_list_menu))
+
     val expandedMenu = remember { mutableStateOf(false) }
     val createListScreenExpanded = remember { mutableStateOf(false) }
-
+    val changeLangScreenExpanded = remember { mutableStateOf(false) }
+    val menuItems = listOf(
+        Pair(stringResource(R.string.create_list_menu)) { createListScreenExpanded.value = true },
+        Pair(stringResource(R.string.change_lang)) { changeLangScreenExpanded.value = true }
+    )
     TopAppBar(
         colors = TopAppBarColors(
             containerColor = MaterialTheme.colorScheme.inversePrimary,
@@ -55,9 +59,11 @@ fun TopBarComponent(
             if (createListScreenExpanded.value)
                 CreateListScreen(
                     confirmEvent = { confirmEvent(it) },
-                    title = "Liste Ekle",
+                    title = stringResource(R.string.create_list_menu),
                     onDismissRequest = { createListScreenExpanded.value = false },
                 )
+
+
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -83,8 +89,8 @@ fun TopBarComponent(
 
                         ) {
                         menuItems.forEachIndexed { _, item ->
-                            DropdownMenuItem(text = { Text(text = item) }, onClick = {
-                                createListScreenExpanded.value = true
+                            DropdownMenuItem(text = { Text(text = item.first) }, onClick = {
+                                item.second()
                                 expandedMenu.value = false
                             })
                         }
