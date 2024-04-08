@@ -116,4 +116,13 @@ class ShoppingListServiceHelper @Inject constructor(
             false
         }
     }
+
+    suspend fun updateShoppingItem(item: ShoppingItem) {
+        try {
+            mItemDao.update(item)
+
+        } catch (exception: Throwable) {
+
+        }
+    }
 }

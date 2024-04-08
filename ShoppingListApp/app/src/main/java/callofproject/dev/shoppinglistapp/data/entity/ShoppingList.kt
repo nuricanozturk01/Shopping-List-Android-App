@@ -2,7 +2,6 @@ package callofproject.dev.shoppinglistapp.data.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
-import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
@@ -13,7 +12,7 @@ data class ShoppingList(
     @ColumnInfo("list_id")
     val listId: Long = 0L,
     @ColumnInfo("list_name")
-    val listName: String = "",
+    var listName: String = "",
     @ColumnInfo("item_count")
     var itemCount: Int = 0,
     @ColumnInfo("creation_time")

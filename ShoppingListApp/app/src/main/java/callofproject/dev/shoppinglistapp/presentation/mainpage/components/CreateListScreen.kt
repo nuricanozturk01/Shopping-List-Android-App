@@ -26,18 +26,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.navigation.compose.hiltViewModel
 import callofproject.dev.shoppinglistapp.R
-import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnClickSaveListBtn
-import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageViewModel
 
 
 @Composable
 fun CreateListScreen(
-    viewModel: MainPageViewModel = hiltViewModel(),
-    onDismissRequest: () -> Unit = {}
+    confirmEvent: (String) -> Unit,
+    title: String,
+    onDismissRequest: () -> Unit = {},
+    defaultValue: String = ""
 ) {
-    var listName by remember { mutableStateOf("") }
+    var listName by remember { mutableStateOf(defaultValue) }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
@@ -51,7 +50,7 @@ fun CreateListScreen(
                 modifier = Modifier.padding(15.dp)
             ) {
                 Text(
-                    text = "Liste Ekle",
+                    text = title,
                     style = TextStyle(
                         fontSize = 20.sp, fontWeight = FontWeight(600),
                         color = MaterialTheme.colorScheme.primary
@@ -74,10 +73,7 @@ fun CreateListScreen(
                         Text(text = stringResource(id = R.string.btn_cancel))
                     }
 
-                    OutlinedButton(onClick = {
-                        viewModel.onEvent(OnClickSaveListBtn(listName))
-                        //onDismissRequest()
-                    }) {
+                    OutlinedButton(onClick = { confirmEvent(listName) }) {
                         Text(text = stringResource(id = R.string.btn_save))
                     }
                 }

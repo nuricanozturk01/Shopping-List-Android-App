@@ -27,6 +27,8 @@
     <string name="info_list_removed_succes">Liste Başarı ile silindi!</string>
     <string name="info_list_removed_fail">Liste silinirket hata ile karşılaşıldı</string>
     <string name="msg_list_added">Liste Başarı ile Eklendi!</string>
+    <string name="not_supported_operartion">Bu sayfada desteklenmiyor!</string>
+    <string name="edit_item_menu">Ürün Düzenle</string>
 
 
 </resources>

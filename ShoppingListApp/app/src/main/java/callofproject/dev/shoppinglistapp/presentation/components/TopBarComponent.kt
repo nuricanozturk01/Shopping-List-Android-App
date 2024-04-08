@@ -29,7 +29,10 @@ import callofproject.dev.shoppinglistapp.presentation.mainpage.components.Create
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarComponent(title: String = stringResource(R.string.default_title)) {
+fun TopBarComponent(
+    confirmEvent: (String) -> Unit,
+    title: String = stringResource(R.string.default_title)
+) {
 
     val menuItems = listOf(stringResource(R.string.create_list_menu))
     val expandedMenu = remember { mutableStateOf(false) }
@@ -40,7 +43,11 @@ fun TopBarComponent(title: String = stringResource(R.string.default_title)) {
             .border(1.dp, Color.Black),
         title = {
             if (createListScreenExpanded.value)
-                CreateListScreen(onDismissRequest = { createListScreenExpanded.value = false })
+                CreateListScreen(
+                    confirmEvent = { confirmEvent(it) },
+                    title = "Liste Ekle",
+                    onDismissRequest = { createListScreenExpanded.value = false },
+                )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -51,6 +58,7 @@ fun TopBarComponent(title: String = stringResource(R.string.default_title)) {
                     fontSize = 20.sp,
                     fontWeight = FontWeight(600)
                 )
+
                 IconButton(onClick = {
                     expandedMenu.value = true
 

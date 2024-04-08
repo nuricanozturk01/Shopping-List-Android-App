@@ -24,9 +24,9 @@ data class ShoppingItem(
     @ColumnInfo("list_id")
     val listId: Long = 0L,
     @ColumnInfo("item_name")
-    val itemName: String = "NO_NAME",
+    var itemName: String = "",
     @ColumnInfo("price")
-    val price: Float = 0F,
+    var price: Float = 0F,
     @ColumnInfo("amount")
-    val amount: Int = 0
+    var amount: Int = 0
 ) : Serializable

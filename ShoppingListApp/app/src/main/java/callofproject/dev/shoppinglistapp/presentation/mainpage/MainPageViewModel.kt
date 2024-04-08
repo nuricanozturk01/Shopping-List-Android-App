@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
+import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.*
 import callofproject.dev.shoppinglistapp.route.UiEvent
 import callofproject.dev.shoppinglistapp.route.UiEvent.ShowSnackbar
 import callofproject.dev.shoppinglistapp.route.UiText.StringResource
@@ -35,19 +37,32 @@ class MainPageViewModel @Inject constructor(
 
     private var findAllJob: Job? = null
 
-    init {
-        findAll()
-    }
 
     fun onEvent(event: MainPageEvent) = when (event) {
-        is MainPageEvent.OnClickSaveListBtn -> saveShoppingList(event.name)
+        is OnClickSaveListBtn -> saveShoppingList(event.name)
 
-        is MainPageEvent.OnRemoveShoppingListClick -> removeList(event.id)
+        is OnRemoveShoppingListClick -> removeList(event.id)
 
-        is MainPageEvent.OnRefreshPage -> findAll()
+        is OnRefreshPage -> findAll()
 
-        is MainPageEvent.OnEditShoppingListClick -> {
+        is OnEditShoppingListClick -> updateShoppingList(event.shoppingList, event.name)
+    }
 
+    private fun updateShoppingList(shoppingList: ShoppingList, name: String) {
+        viewModelScope.launch {
+
+            shoppingList.listName = name
+            mServiceHelper.updateShoppingList(shoppingList)
+
+            _state.value = state.value.copy(
+                shoppingLists = state.value.shoppingLists.map {
+                    if (shoppingList.listId == it.listId)
+                        it.listName = name
+                    it
+                }
+            )
+
+            _uiEvent.send(UiEvent.ShowToastMessage(StringResource(R.string.msg_list_added)))
         }
     }
 
@@ -78,7 +93,7 @@ class MainPageViewModel @Inject constructor(
         }
     }
 
-    private fun findAll() {
+    fun findAll() {
         findAllJob?.cancel()
         findAllJob = viewModelScope.launch {
             mServiceHelper.findAllShoppingLists().onEach { result ->

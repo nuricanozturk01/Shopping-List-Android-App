@@ -45,6 +45,7 @@ class MainActivity : ComponentActivity() {
                         navController = navController,
                         startDestination = if (isSelectedMoney == null) Route.INFLUX_MONEY else Route.MAIN_PAGE
                     ) {
+
                         composable(Route.INFLUX_MONEY) {
                             InfluxMoneyScreen(onNextClick = { navController.navigate(Route.MAIN_PAGE) })
                         }
@@ -61,11 +62,9 @@ class MainActivity : ComponentActivity() {
                             }
                         )) {
                             val id = it.arguments?.getLong("listId")!!
-                            ShoppingListScreen(shoppingListId = id)
+                            ShoppingListScreen(scaffoldState = scaffoldState, shoppingListId = id)
                         }
-
                     }
-
                 }
             }
         }

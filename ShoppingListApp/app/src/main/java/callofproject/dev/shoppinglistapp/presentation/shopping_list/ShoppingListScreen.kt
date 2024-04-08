@@ -19,6 +19,8 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -36,13 +38,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import callofproject.dev.shoppinglistapp.R
+import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.presentation.components.TopBarComponent
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent.OnRefreshPage
-import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemCreateScreen
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemUpsertScreen
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemScreen
+import callofproject.dev.shoppinglistapp.route.UiEvent
 
 @Composable
-fun ShoppingListScreen(viewModel: ShoppingListViewModel = hiltViewModel(), shoppingListId: Long) {
+fun ShoppingListScreen(
+    viewModel: ShoppingListViewModel = hiltViewModel(),
+    shoppingListId: Long,
+    scaffoldState: SnackbarHostState
+) {
     viewModel.setListId(shoppingListId)
     var expandedCreateModal by remember { mutableStateOf(false) }
 
@@ -54,12 +62,43 @@ fun ShoppingListScreen(viewModel: ShoppingListViewModel = hiltViewModel(), shopp
         viewModel.findAll(shoppingListId)
         onDispose { }
     }
-    LaunchedEffect(key1 = true) {
 
-        Toast.makeText(context, state.listId.toString(), Toast.LENGTH_LONG).show()
+    LaunchedEffect(key1 = state.shoppingItemList) {
+        viewModel.evaluateTotalPrice() // insert or remove
     }
+
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is UiEvent.ShowSnackbar -> {
+                    scaffoldState.showSnackbar(
+                        message = event.message.asString(context),
+                        duration = SnackbarDuration.Short,
+                        withDismissAction = true
+                    )
+                }
+
+                is UiEvent.ShowToastMessage -> {
+                    Toast.makeText(context, event.message.asString(context), Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                else -> Unit
+            }
+        }
+    }
+
+
     Column(modifier = Modifier.fillMaxSize()) {
-        TopBarComponent()
+        // Doing nothing
+        TopBarComponent(confirmEvent = {
+            Toast.makeText(
+                context,
+                context.getString(R.string.not_supported_operartion),
+                Toast.LENGTH_SHORT
+            ).show()
+        })
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -93,9 +132,22 @@ fun ShoppingListScreen(viewModel: ShoppingListViewModel = hiltViewModel(), shopp
         }
 
         if (expandedCreateModal)
-            ShoppingItemCreateScreen(onDismissRequest = {
-                expandedCreateModal = false
-            }, listId = shoppingListId)
+            ShoppingItemUpsertScreen(
+                onDismissRequest = { expandedCreateModal = false },
+                title = stringResource(R.string.create_item_menu),
+                confirmEvent = {
+                    viewModel.onEvent(
+                        ShoppingListEvent.OnCreateItemClick(
+                            ShoppingItemCreateDTO(
+                                viewModel.itemName,
+                                viewModel.price.toFloat(),
+                                viewModel.amount.toInt(),
+                                shoppingListId
+                            )
+                        )
+                    )
+                }
+            )
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -106,21 +158,15 @@ fun ShoppingListScreen(viewModel: ShoppingListViewModel = hiltViewModel(), shopp
 
                 items(state.shoppingItemList.size) { idx ->
                     ShoppingItemScreen(
-                        itemName = state.shoppingItemList[idx].itemName,
-                        unitPrice = state.shoppingItemList[idx].price.toString(),
-                        amount = state.shoppingItemList[idx].amount.toString(),
-                        totalPrice = viewModel.evaluate(
-                            state.shoppingItemList[idx].price,
-                            state.shoppingItemList[idx].amount
-                        ),
+                        item = state.shoppingItemList[idx],
+                        influxMoney = viewModel.influxMoney.value,
                         onDeleteClick = {
                             viewModel.onEvent(
                                 ShoppingListEvent.OnRemoveItemClick(
                                     state.shoppingItemList[idx].itemId
                                 )
                             )
-                        },
-                        onEditClick = {}
+                        }
                     )
                 }
             } else {

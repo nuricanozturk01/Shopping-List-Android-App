@@ -15,6 +15,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,19 +26,23 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import callofproject.dev.shoppinglistapp.R
+import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.presentation.components.SummaryDisplay
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListViewModel
 
 
 @Composable
 fun ShoppingItemScreen(
-    itemName: String,
-    unitPrice: String,
-    amount: String,
-    totalPrice: String,
+    influxMoney: String,
     onDeleteClick: () -> Unit,
-    onEditClick: () -> Unit
+    item: ShoppingItem,
+    viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
+    var expandedEditModal by remember { mutableStateOf(false) }
 
     Row(
         modifier = Modifier
@@ -56,14 +64,23 @@ fun ShoppingItemScreen(
         ) {
 
             Text(
-                text = itemName,
+                text = item.itemName,
                 style = MaterialTheme.typography.headlineSmall,
                 overflow = TextOverflow.Ellipsis
             )
 
-            SummaryDisplay(title = stringResource(R.string.price), price = unitPrice)
-            SummaryDisplay(title = stringResource(R.string.item_amount), price = amount)
-            SummaryDisplay(title = stringResource(R.string.total_price), price = totalPrice)
+            SummaryDisplay(
+                title = "${stringResource(R.string.price)}($influxMoney)",
+                price = item.price.toString()
+            )
+            SummaryDisplay(
+                title = stringResource(R.string.item_amount),
+                price = item.amount.toString()
+            )
+            SummaryDisplay(
+                title = "${stringResource(R.string.total_price)}($influxMoney)",
+                price = (item.price * item.amount).toString()
+            )
         }
 
         Icon(
@@ -71,7 +88,7 @@ fun ShoppingItemScreen(
             contentDescription = "",
             modifier = Modifier
                 .size(35.dp)
-                .clickable { onEditClick() }
+                .clickable { expandedEditModal = true }
         )
         Icon(
             Icons.Filled.Delete,
@@ -80,5 +97,16 @@ fun ShoppingItemScreen(
                 .size(35.dp)
                 .clickable { onDeleteClick() }
         )
+
+        if (expandedEditModal) {
+            ShoppingItemUpsertScreen(
+                title = stringResource(R.string.edit_item_menu),
+                defaultValue = item,
+                onDismissRequest = { expandedEditModal = false },
+                confirmEvent = {
+                    viewModel.onEvent(ShoppingListEvent.OnEditShoppingItem(item))
+                },
+            )
+        }
     }
 }

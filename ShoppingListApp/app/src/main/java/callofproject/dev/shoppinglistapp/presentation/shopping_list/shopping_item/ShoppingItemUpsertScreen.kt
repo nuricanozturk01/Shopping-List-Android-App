@@ -14,10 +14,7 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,21 +25,31 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import callofproject.dev.shoppinglistapp.R
+import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListViewModel
 
 
 @Composable
-fun ShoppingItemCreateScreen(
+fun ShoppingItemUpsertScreen(
     onDismissRequest: () -> Unit,
-    listId: Long,
+    title: String,
+    defaultValue: ShoppingItem = ShoppingItem(),
+    confirmEvent: (ShoppingItem) -> Unit,
     viewModel: ShoppingListViewModel = hiltViewModel()
 ) {
-    var itemName by remember { mutableStateOf("") }
-    var amount by remember { mutableStateOf("") }
-    var price by remember { mutableStateOf("") }
+    DisposableEffect(key1 = Unit) {
+        viewModel.itemName = defaultValue.itemName
+        viewModel.price = defaultValue.price.toString()
+        viewModel.amount = defaultValue.amount.toString()
 
+        onDispose {
+            viewModel.itemName = ""
+            viewModel.price = ""
+            viewModel.amount = ""
+        }
+    }
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -55,7 +62,7 @@ fun ShoppingItemCreateScreen(
                 modifier = Modifier.padding(15.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.create_item_menu),
+                    text = title,
                     style = TextStyle(
                         fontSize = 20.sp, fontWeight = FontWeight(600),
                         color = MaterialTheme.colorScheme.primary
@@ -63,22 +70,22 @@ fun ShoppingItemCreateScreen(
                 )
                 OutlinedTextField(
                     label = { Text(text = stringResource(R.string.item_name)) },
-                    value = itemName,
-                    onValueChange = { itemName = it })
+                    value = viewModel.itemName,
+                    onValueChange = { viewModel.itemName = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
                     label = { Text(text = stringResource(R.string.item_amount)) },
-                    value = amount,
-                    onValueChange = { amount = it })
+                    value = viewModel.amount.toString(),
+                    onValueChange = { viewModel.amount = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
                     label = { Text(text = stringResource(R.string.unit_price)) },
-                    value = price,
-                    onValueChange = { price = it })
+                    value = viewModel.price,
+                    onValueChange = { viewModel.price = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -92,16 +99,11 @@ fun ShoppingItemCreateScreen(
                     }
 
                     OutlinedButton(onClick = {
-                        viewModel.onEvent(
-                            ShoppingListEvent.OnCreateItemClick(
-                                ShoppingItemCreateDTO(
-                                    itemName,
-                                    price.toFloat(),
-                                    amount.toInt(),
-                                    listId = listId
-                                )
-                            )
-                        )
+                        defaultValue.itemName = viewModel.itemName
+                        defaultValue.amount = viewModel.amount.toInt()
+                        defaultValue.price = viewModel.price.toFloat()
+
+                        confirmEvent(defaultValue)
                         onDismissRequest()
                     }) {
                         Text(text = stringResource(R.string.btn_save))

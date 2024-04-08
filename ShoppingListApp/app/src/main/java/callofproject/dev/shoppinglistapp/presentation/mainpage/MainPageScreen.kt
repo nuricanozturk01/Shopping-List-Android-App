@@ -15,6 +15,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,10 @@ fun MainPageScreen(
     val state = viewModel.state.value
     val context = LocalContext.current
 
+    DisposableEffect(key1 = Unit) {
+        viewModel.findAll()
+        onDispose { }
+    }
     LaunchedEffect(key1 = Unit) {
         viewModel.uiEvent.collect { event ->
             when (event) {
@@ -57,7 +62,7 @@ fun MainPageScreen(
         }
     }
     Column(modifier = Modifier.fillMaxSize()) {
-        TopBarComponent()
+        TopBarComponent(confirmEvent = { viewModel.onEvent(MainPageEvent.OnClickSaveListBtn(it)) })
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,17 +72,7 @@ fun MainPageScreen(
             if (state.shoppingLists.isNotEmpty()) {
                 items(state.shoppingLists.size) { idx ->
                     ShoppingListItem(
-                        listName = state.shoppingLists[idx].listName,
-                        creationTime = viewModel.toDateTimeStr(state.shoppingLists[idx].creationTime),
-                        itemCount = "${state.shoppingLists[idx].itemCount} ürün listelendi",
-                        onEditClick = { },
-                        onDeleteClick = {
-                            viewModel.onEvent(
-                                MainPageEvent.OnRemoveShoppingListClick(
-                                    state.shoppingLists[idx].listId
-                                )
-                            )
-                        },
+                        shoppingListItem = state.shoppingLists[idx],
                         onItemsClick = { onNavigateToItems(state.shoppingLists[idx].listId) }
                     )
                 }

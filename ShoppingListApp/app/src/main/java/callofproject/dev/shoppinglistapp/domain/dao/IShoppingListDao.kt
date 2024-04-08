@@ -22,7 +22,7 @@ interface IShoppingListDao {
     suspend fun removeAll(lists: List<ShoppingList>)
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun update(list: ShoppingList): Int
+    suspend fun update(list: ShoppingList)
 
     @Query("select * from shopping_list where list_id = :id")
     suspend fun findById(id: Long): ShoppingList?

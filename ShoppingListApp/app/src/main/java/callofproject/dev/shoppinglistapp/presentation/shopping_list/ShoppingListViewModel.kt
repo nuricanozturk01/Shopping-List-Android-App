@@ -1,11 +1,15 @@
 package callofproject.dev.shoppinglistapp.presentation.shopping_list
 
 import androidx.compose.runtime.State
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
+import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
 import callofproject.dev.shoppinglistapp.route.UiEvent
@@ -14,6 +18,7 @@ import callofproject.dev.shoppinglistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -24,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ShoppingListViewModel @Inject constructor(
     private val mServiceHelper: ShoppingListServiceHelper,
-    private val mPreferences: IPreferences
+    mPreferences: IPreferences
 ) : ViewModel() {
 
     private val _state = mutableStateOf(ShoppingListState())
@@ -32,6 +37,10 @@ class ShoppingListViewModel @Inject constructor(
 
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
+
+    var itemName by mutableStateOf("")
+    var amount by mutableStateOf("")
+    var price by mutableStateOf("")
 
     val influxMoney = mutableStateOf("₺")
     val totalPrice = mutableStateOf("0")
@@ -41,7 +50,6 @@ class ShoppingListViewModel @Inject constructor(
         influxMoney.value = mPreferences.getInfluxMoney()!!
     }
 
-
     fun onEvent(event: ShoppingListEvent) {
         when (event) {
             is ShoppingListEvent.OnCreateItemClick -> {
@@ -50,7 +58,27 @@ class ShoppingListViewModel @Inject constructor(
 
             is ShoppingListEvent.OnRemoveItemClick -> removeItemById(event.itemId)
 
-            else -> Unit
+            is ShoppingListEvent.OnRefreshPage -> {}
+
+            is ShoppingListEvent.OnEditShoppingItem -> updateShoppingItem(event.item)
+        }
+    }
+
+    private fun updateShoppingItem(item: ShoppingItem) {
+        viewModelScope.launch {
+            mServiceHelper.updateShoppingItem(item)
+            _state.value = state.value.copy(
+                shoppingItemList = state.value.shoppingItemList
+                    .map {
+                        if (it.itemId == item.itemId) {
+                            it.itemName = item.itemName
+                            it.amount = item.amount
+                            it.price = item.price
+                        }
+                        it
+                    }
+            )
+            evaluateTotalPrice()
         }
     }
 
@@ -88,6 +116,7 @@ class ShoppingListViewModel @Inject constructor(
             val list = mServiceHelper.findShoppingListById(listId)
             if (counter > 0)
                 list!!.itemCount = list.itemCount + 1
+
             else list!!.itemCount = list.itemCount - 1
 
 
@@ -95,7 +124,6 @@ class ShoppingListViewModel @Inject constructor(
         }
     }
 
-    fun evaluate(price: Float, amount: Int): String = (price * amount).toString()
     fun setListId(shoppingListId: Long) {
         viewModelScope.launch {
             _state.value = state.value.copy(
@@ -120,6 +148,7 @@ class ShoppingListViewModel @Inject constructor(
                         _state.value = _state.value.copy(
                             shoppingItemList = result.data ?: emptyList(),
                         )
+                        evaluateTotalPrice()
                     }
 
                     is Resource.Error -> {
@@ -128,5 +157,15 @@ class ShoppingListViewModel @Inject constructor(
                 }
             }.launchIn(this)
         }
+    }
+
+    fun evaluate(price: Float, amount: Int): String = (price * amount).toString()
+    fun evaluateTotalPrice() {
+        totalPrice.value =
+            state.value.shoppingItemList.map { it.price * it.amount }.sum().toString()
+    }
+
+    fun emptyItem(): ShoppingItem {
+        return ShoppingItem()
     }
 }
