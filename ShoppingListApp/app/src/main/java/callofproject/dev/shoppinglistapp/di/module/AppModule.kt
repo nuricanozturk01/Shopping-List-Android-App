@@ -5,6 +5,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import callofproject.dev.shoppinglistapp.data.preferences.DefaultPreferences
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
+import callofproject.dev.shoppinglistapp.domain.use_case.StrLengthUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,4 +27,8 @@ object AppModule {
     fun providePreferences(sharedPreferences: SharedPreferences): IPreferences {
         return DefaultPreferences(sharedPreferences)
     }
+
+    @Provides
+    @Singleton
+    fun provideStringValidate(): StrLengthUseCase = StrLengthUseCase()
 }

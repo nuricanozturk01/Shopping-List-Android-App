@@ -1,13 +1,14 @@
 package callofproject.dev.shoppinglistapp.presentation.shopping_list
 
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -31,9 +32,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,8 +44,8 @@ import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.presentation.components.TopBarComponent
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent.OnRefreshPage
-import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemUpsertScreen
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemScreen
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemUpsertScreen
 import callofproject.dev.shoppinglistapp.route.UiEvent
 
 @Composable
@@ -102,9 +105,11 @@ fun ShoppingListScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clip(RoundedCornerShape(45))
                 .padding(10.dp)
-                .heightIn(min = 50.dp)
-                .shadow(1.dp),
+                .height(50.dp)
+                .background(MaterialTheme.colorScheme.onSecondary)
+                .shadow(.5.dp, clip = true, shape = RoundedCornerShape(1.dp)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
@@ -116,8 +121,9 @@ fun ShoppingListScreen(
             )
             Text(
                 modifier = Modifier.padding(10.dp),
-                text = "${viewModel.influxMoney.value}${viewModel.totalPrice.value}",
+                text = "${viewModel.influxMoney.value} ${viewModel.totalPrice.value}",
                 style = MaterialTheme.typography.bodyLarge,
+                fontFamily = FontFamily.Serif
             )
 
             Spacer(modifier = Modifier.width(130.dp))
@@ -131,23 +137,17 @@ fun ShoppingListScreen(
             }
         }
 
-        if (expandedCreateModal)
+        if (expandedCreateModal) {
             ShoppingItemUpsertScreen(
                 onDismissRequest = { expandedCreateModal = false },
                 title = stringResource(R.string.create_item_menu),
-                confirmEvent = {
-                    viewModel.onEvent(
-                        ShoppingListEvent.OnCreateItemClick(
-                            ShoppingItemCreateDTO(
-                                viewModel.itemName,
-                                viewModel.price.toFloat(),
-                                viewModel.amount.toInt(),
-                                shoppingListId
-                            )
-                        )
-                    )
+                confirmEvent = { name, amount, price ->
+                    val dto = ShoppingItemCreateDTO(name, price.toFloat(), amount.toInt(), shoppingListId)
+                    viewModel.onEvent(ShoppingListEvent.OnCreateItemClick(dto))
                 }
             )
+        }
+
 
         LazyColumn(
             modifier = Modifier.fillMaxSize(),

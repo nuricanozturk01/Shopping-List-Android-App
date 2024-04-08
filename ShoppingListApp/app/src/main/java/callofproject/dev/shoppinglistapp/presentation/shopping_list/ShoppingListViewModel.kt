@@ -1,10 +1,7 @@
 package callofproject.dev.shoppinglistapp.presentation.shopping_list
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
@@ -12,13 +9,13 @@ import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
+import callofproject.dev.shoppinglistapp.domain.use_case.StrLengthUseCase
 import callofproject.dev.shoppinglistapp.route.UiEvent
 import callofproject.dev.shoppinglistapp.route.UiText
 import callofproject.dev.shoppinglistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -29,6 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ShoppingListViewModel @Inject constructor(
     private val mServiceHelper: ShoppingListServiceHelper,
+    val mValidateString: StrLengthUseCase,
     mPreferences: IPreferences
 ) : ViewModel() {
 
@@ -38,10 +36,6 @@ class ShoppingListViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
-    var itemName by mutableStateOf("")
-    var amount by mutableStateOf("")
-    var price by mutableStateOf("")
-
     val influxMoney = mutableStateOf("₺")
     val totalPrice = mutableStateOf("0")
     private var findAllJob: Job? = null
@@ -50,23 +44,39 @@ class ShoppingListViewModel @Inject constructor(
         influxMoney.value = mPreferences.getInfluxMoney()!!
     }
 
-    fun onEvent(event: ShoppingListEvent) {
-        when (event) {
-            is ShoppingListEvent.OnCreateItemClick -> {
-                createShoppingItem(event.dto)
-            }
+    fun onEvent(event: ShoppingListEvent) = when (event) {
+        is ShoppingListEvent.OnCreateItemClick -> createShoppingItem(event.dto)
 
-            is ShoppingListEvent.OnRemoveItemClick -> removeItemById(event.itemId)
+        is ShoppingListEvent.OnRemoveItemClick -> removeItemById(event.itemId)
 
-            is ShoppingListEvent.OnRefreshPage -> {}
+        is ShoppingListEvent.OnRefreshPage -> findAll(state.value.listId)
 
-            is ShoppingListEvent.OnEditShoppingItem -> updateShoppingItem(event.item)
-        }
+        is ShoppingListEvent.OnEditShoppingItem -> updateShoppingItem(
+            event.item,
+            event.name,
+            event.amount,
+            event.price
+        )
     }
 
-    private fun updateShoppingItem(item: ShoppingItem) {
+    private fun updateShoppingItem(
+        item: ShoppingItem,
+        name: String,
+        amount: String,
+        price: String
+    ) {
         viewModelScope.launch {
+
+            if (!mValidateString(name)) {
+                _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.message_validate_str)))
+                return@launch
+            }
+
+            item.itemName = name
+            item.amount = amount.toInt()
+            item.price = price.toFloat()
             mServiceHelper.updateShoppingItem(item)
+
             _state.value = state.value.copy(
                 shoppingItemList = state.value.shoppingItemList
                     .map {
@@ -78,7 +88,9 @@ class ShoppingListViewModel @Inject constructor(
                         it
                     }
             )
+
             evaluateTotalPrice()
+            _uiEvent.send(UiEvent.ShowSnackbar(UiText.StringResource(R.string.msg_item_updated)))
         }
     }
 
@@ -93,7 +105,7 @@ class ShoppingListViewModel @Inject constructor(
             _state.value = state.value.copy(shoppingItemList = state.value.shoppingItemList
                 .filter { it.itemId != itemId })
             updateShoppingList(state.value.listId, -1)
-            _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.info_list_removed_succes)))
+            _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.info_item_removed_succes)))
 
 
         }
@@ -101,13 +113,20 @@ class ShoppingListViewModel @Inject constructor(
 
     private fun createShoppingItem(dto: ShoppingItemCreateDTO) {
         viewModelScope.launch {
+
+            if (!mValidateString(dto.itemName)) {
+                _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.message_validate_str)))
+                return@launch
+            }
+
             val shoppingItem = mServiceHelper.createShoppingItem(dto)
             updateShoppingList(shoppingItem!!.listId, 1)
+
             _state.value = state.value.copy(
                 shoppingItemList = state.value.shoppingItemList + shoppingItem
             )
 
-            _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.msg_list_added)))
+            _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.msg_item_added)))
         }
     }
 
@@ -116,9 +135,7 @@ class ShoppingListViewModel @Inject constructor(
             val list = mServiceHelper.findShoppingListById(listId)
             if (counter > 0)
                 list!!.itemCount = list.itemCount + 1
-
             else list!!.itemCount = list.itemCount - 1
-
 
             mServiceHelper.updateShoppingList(list)
         }
@@ -159,13 +176,10 @@ class ShoppingListViewModel @Inject constructor(
         }
     }
 
-    fun evaluate(price: Float, amount: Int): String = (price * amount).toString()
     fun evaluateTotalPrice() {
         totalPrice.value =
             state.value.shoppingItemList.map { it.price * it.amount }.sum().toString()
     }
 
-    fun emptyItem(): ShoppingItem {
-        return ShoppingItem()
-    }
+
 }

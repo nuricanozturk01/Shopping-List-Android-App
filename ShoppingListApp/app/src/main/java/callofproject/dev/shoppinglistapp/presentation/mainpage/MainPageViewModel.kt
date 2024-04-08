@@ -7,9 +7,14 @@ import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
-import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.*
+import callofproject.dev.shoppinglistapp.domain.use_case.StrLengthUseCase
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnClickSaveListBtn
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnEditShoppingListClick
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnRefreshPage
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnRemoveShoppingListClick
 import callofproject.dev.shoppinglistapp.route.UiEvent
 import callofproject.dev.shoppinglistapp.route.UiEvent.ShowSnackbar
+import callofproject.dev.shoppinglistapp.route.UiEvent.ShowToastMessage
 import callofproject.dev.shoppinglistapp.route.UiText.StringResource
 import callofproject.dev.shoppinglistapp.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -26,6 +31,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainPageViewModel @Inject constructor(
     private val mServiceHelper: ShoppingListServiceHelper,
+    private val mValidateString: StrLengthUseCase,
     private val mFormatter: DateTimeFormatter
 ) : ViewModel() {
 
@@ -51,6 +57,11 @@ class MainPageViewModel @Inject constructor(
     private fun updateShoppingList(shoppingList: ShoppingList, name: String) {
         viewModelScope.launch {
 
+            if (!mValidateString(name)) {
+                _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
+                return@launch
+            }
+
             shoppingList.listName = name
             mServiceHelper.updateShoppingList(shoppingList)
 
@@ -62,7 +73,7 @@ class MainPageViewModel @Inject constructor(
                 }
             )
 
-            _uiEvent.send(UiEvent.ShowToastMessage(StringResource(R.string.msg_list_added)))
+            _uiEvent.send(ShowToastMessage(StringResource(R.string.msg_list_updated)))
         }
     }
 
@@ -71,25 +82,33 @@ class MainPageViewModel @Inject constructor(
             val result = mServiceHelper.removeShoppingListById(id)
 
             if (!result) {
-                _uiEvent.send(UiEvent.ShowToastMessage(StringResource(R.string.info_list_removed_fail)))
+                _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
                 return@launch
             }
-            _uiEvent.send(UiEvent.ShowToastMessage(StringResource(R.string.info_list_removed_succes)))
+            _uiEvent.send(ShowToastMessage(StringResource(R.string.info_list_removed_succes)))
 
             _state.value = state.value.copy(shoppingLists = state.value.shoppingLists
                 .filter { it.listId != id })
+
+            _uiEvent.send(ShowSnackbar(StringResource(R.string.msg_item_removed)))
         }
     }
 
     private fun saveShoppingList(name: String) {
         viewModelScope.launch {
+
+            if (!mValidateString(name)) {
+                _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
+                return@launch
+            }
+
             val shoppingList = mServiceHelper.createShoppingList(name)
 
             _state.value = state.value.copy(
                 shoppingLists = state.value.shoppingLists + shoppingList!!
             )
 
-            _uiEvent.send(UiEvent.ShowToastMessage(StringResource(R.string.msg_list_added)))
+            _uiEvent.send(ShowToastMessage(StringResource(R.string.msg_list_added)))
         }
     }
 

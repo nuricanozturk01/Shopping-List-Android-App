@@ -14,7 +14,6 @@ fun SummaryDisplay(title: String, price: String) {
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
-
             textAlign = TextAlign.End
         )
         Text(
