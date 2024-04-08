@@ -1,6 +1,8 @@
 # Shopping-List-Android-App 
 ## Description
 You can note your shopping items and control your expenses with the shopping list application. It is a project developed for reinforcement and learning purposes.
+
+- Later, I can improve the UI.
 ## Used Libraries/Frameworks/Architectures...
 - Room DB
 - Dagger Hilt (DI)
