@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">ShoppingListApp</string>
-    <string name="date_time_formatter">dd/MM/yyyy</string>
+    <string name="date_time_formatter">dd/MM/yyyy kk:mm:ss</string>
     <string name="default_title">Shopping List Application</string>
     <string name="descriptor_image_menu">menu image</string>
     <string name="item_amount">Miktar</string>
-    <string name="unit_price">Fiyat</string>
+    <string name="item_name">Ürün İsmi</string>
+    <string name="price">Fiyat</string>
+    <string name="unit_price">Birim Fiyatı</string>
     <string name="total_price">Toplam</string>
     <string name="times">x</string>
     <string name="money_tl">₺</string>
@@ -20,6 +22,11 @@
     <string name="btn_save">Kaydet</string>
     <string name="btn_cancel">İptal</string>
     <string name="create_list_menu">Liste Ekle</string>
+    <string name="create_item_menu">Ürün Ekle</string>
+    <string name="error_find_shopping_list">Beklenmeyen bir hata oluştu</string>
+    <string name="info_list_removed_succes">Liste Başarı ile silindi!</string>
+    <string name="info_list_removed_fail">Liste silinirket hata ile karşılaşıldı</string>
+    <string name="msg_list_added">Liste Başarı ile Eklendi!</string>
 
 
 </resources>

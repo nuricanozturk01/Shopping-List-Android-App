@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.presentation.shopping_list
+package callofproject.dev.shoppinglistapp.presentation.mainpage.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,12 +20,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import callofproject.dev.shoppinglistapp.R
+import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnClickSaveListBtn
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageViewModel
 
 
@@ -35,7 +38,7 @@ fun CreateListScreen(
     onDismissRequest: () -> Unit = {}
 ) {
     var listName by remember { mutableStateOf("") }
-    val state = viewModel.state
+
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -68,14 +71,14 @@ fun CreateListScreen(
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     OutlinedButton(onClick = { onDismissRequest() }) {
-                        Text(text = "İptal")
+                        Text(text = stringResource(id = R.string.btn_cancel))
                     }
 
                     OutlinedButton(onClick = {
-                        viewModel.onEvent(ShoppingListEvent.OnClickSaveListBtn(listName))
-                        onDismissRequest()
+                        viewModel.onEvent(OnClickSaveListBtn(listName))
+                        //onDismissRequest()
                     }) {
-                        Text(text = "Kaydet")
+                        Text(text = stringResource(id = R.string.btn_save))
                     }
                 }
             }

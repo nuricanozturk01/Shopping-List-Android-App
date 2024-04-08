@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 
@@ -26,4 +27,11 @@ interface IShoppingItemDao {
 
     @Query("select * from shopping_item where itemId = :id")
     suspend fun findById(id: Long): ShoppingItem?
+
+    @Query(
+        """SELECT * FROM shopping_list sl INNER JOIN shopping_item si on sl.list_id = si.list_id 
+            WHERE sl.list_id = :listId order by si.list_id desc
+    """
+    )
+    suspend fun findAllItemsByListId(listId: Long): List<ShoppingItem>
 }

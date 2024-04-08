@@ -25,7 +25,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import callofproject.dev.shoppinglistapp.R
-import callofproject.dev.shoppinglistapp.presentation.shopping_list.CreateListScreen
+import callofproject.dev.shoppinglistapp.presentation.mainpage.components.CreateListScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

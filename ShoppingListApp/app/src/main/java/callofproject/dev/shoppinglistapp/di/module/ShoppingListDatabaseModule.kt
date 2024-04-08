@@ -40,6 +40,7 @@ object ShoppingListDatabaseModule {
         return db.createShoppingListDao()
     }
 
+
     @Provides
     @Singleton
     fun provideServiceHelper(

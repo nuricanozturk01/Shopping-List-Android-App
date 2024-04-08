@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.presentation.shopping_item
+package callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,7 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.presentation.components.SummaryDisplay
@@ -28,17 +28,14 @@ import callofproject.dev.shoppinglistapp.presentation.components.SummaryDisplay
 
 @Composable
 fun ShoppingItemScreen(
-    itemName: String = "Tavuk",
-    unitPrice: String = "100",
-    amount: String = "5",
-    totalPrice: String = "500",
-    onDeleteClick: () -> Unit = {},
-    onEditClick: () -> Unit = {}
+    itemName: String,
+    unitPrice: String,
+    amount: String,
+    totalPrice: String,
+    onDeleteClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
-    val itemCountStr = stringResource(R.string.item_amount)
-    val unitPriceStr = stringResource(R.string.unit_price)
-    val totalStr = stringResource(R.string.total_price)
-    val timesStr = "x"
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -61,12 +58,12 @@ fun ShoppingItemScreen(
             Text(
                 text = itemName,
                 style = MaterialTheme.typography.headlineSmall,
+                overflow = TextOverflow.Ellipsis
             )
 
-            SummaryDisplay(title = unitPriceStr, price = unitPrice)
-            SummaryDisplay(title = "", price = timesStr)
-            SummaryDisplay(title = itemCountStr, price = amount)
-            SummaryDisplay(title = totalStr, price = totalPrice)
+            SummaryDisplay(title = stringResource(R.string.price), price = unitPrice)
+            SummaryDisplay(title = stringResource(R.string.item_amount), price = amount)
+            SummaryDisplay(title = stringResource(R.string.total_price), price = totalPrice)
         }
 
         Icon(
@@ -84,11 +81,4 @@ fun ShoppingItemScreen(
                 .clickable { onDeleteClick() }
         )
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewItem() {
-    ShoppingItemScreen()
 }

@@ -5,7 +5,12 @@ import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemDTO
 
 fun ShoppingItemCreateDTO.toShoppingItem(): ShoppingItem {
-    return ShoppingItem(itemName = this.itemName, price = this.price, amount = this.amount)
+    return ShoppingItem(
+        itemName = this.itemName,
+        price = this.price,
+        amount = this.amount,
+        listId = this.listId
+    )
 }
 
 fun ShoppingItem.toShoppingItemDTO(): ShoppingItemDTO {

@@ -9,7 +9,11 @@ import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
 import callofproject.dev.shoppinglistapp.domain.dao.IShoppingItemDao
 import callofproject.dev.shoppinglistapp.domain.dao.IShoppingListDao
 
-@Database(entities = [ShoppingItem::class, ShoppingList::class], version = 1, exportSchema = false)
+@Database(
+    entities = [ShoppingItem::class, ShoppingList::class],
+    version = 1,
+    exportSchema = false
+)
 @TypeConverters(LocalDateTimeConverter::class)
 abstract class ShoppingApplicationDatabase : RoomDatabase() {
     abstract fun createShoppingItemDao(): IShoppingItemDao

@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.presentation.components
+package callofproject.dev.shoppinglistapp.presentation.mainpage.components
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -72,19 +73,20 @@ fun ShoppingListItem(
                 maxLines = 2
             )
         }
-        Icon(
-            Icons.Filled.Edit,
-            contentDescription = "",
-            modifier = Modifier
-                .size(35.dp)
-                .clickable { onEditClick() }
-        )
-        Icon(
-            Icons.Filled.Delete,
-            contentDescription = "",
-            modifier = Modifier
-                .size(35.dp)
-                .clickable { onDeleteClick() }
-        )
+        IconButton(onClick = onEditClick) {
+            Icon(
+                Icons.Filled.Edit,
+                contentDescription = "",
+                modifier = Modifier.size(35.dp)
+            )
+        }
+        IconButton(onClick = onDeleteClick) {
+            Icon(
+                Icons.Filled.Delete,
+                contentDescription = "",
+                modifier = Modifier.size(35.dp)
+            )
+
+        }
     }
 }

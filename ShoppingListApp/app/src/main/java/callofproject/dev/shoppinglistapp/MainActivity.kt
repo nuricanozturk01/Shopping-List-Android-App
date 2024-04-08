@@ -10,9 +10,11 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
 import callofproject.dev.shoppinglistapp.presentation.influx_money.InfluxMoneyScreen
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageScreen
@@ -48,12 +50,18 @@ class MainActivity : ComponentActivity() {
                         }
 
                         composable(Route.MAIN_PAGE) {
-                            MainPageScreen(scaffoldState = scaffoldState,
-                                onItemsClick = { navController.navigate(Route.SHOPPING_LIST_ITEM) })
+                            MainPageScreen(scaffoldState = scaffoldState, onNavigateToItems = {
+                                navController.navigate("${Route.SHOPPING_LIST_ITEM}/$it")
+                            })
                         }
 
-                        composable(Route.SHOPPING_LIST_ITEM) {
-                            ShoppingListScreen()
+                        composable("${Route.SHOPPING_LIST_ITEM}/{listId}", arguments = listOf(
+                            navArgument("listId") {
+                                type = NavType.LongType
+                            }
+                        )) {
+                            val id = it.arguments?.getLong("listId")!!
+                            ShoppingListScreen(shoppingListId = id)
                         }
 
                     }

@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.presentation.shopping_item
+package callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,18 +20,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.hilt.navigation.compose.hiltViewModel
+import callofproject.dev.shoppinglistapp.R
+import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent
+import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListViewModel
 
 
 @Composable
-fun MinimalDialog(onDismissRequest: () -> Unit) {
+fun ShoppingItemCreateScreen(
+    onDismissRequest: () -> Unit,
+    listId: Long,
+    viewModel: ShoppingListViewModel = hiltViewModel()
+) {
     var itemName by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
+
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier
@@ -44,28 +55,28 @@ fun MinimalDialog(onDismissRequest: () -> Unit) {
                 modifier = Modifier.padding(15.dp)
             ) {
                 Text(
-                    text = "Ürün Ekle",
+                    text = stringResource(R.string.create_item_menu),
                     style = TextStyle(
                         fontSize = 20.sp, fontWeight = FontWeight(600),
                         color = MaterialTheme.colorScheme.primary
                     )
                 )
                 OutlinedTextField(
-                    label = { Text(text = "Ürün Adı") },
+                    label = { Text(text = stringResource(R.string.item_name)) },
                     value = itemName,
                     onValueChange = { itemName = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
-                    label = { Text(text = "Miktar") },
+                    label = { Text(text = stringResource(R.string.item_amount)) },
                     value = amount,
                     onValueChange = { amount = it })
 
                 Spacer(modifier = Modifier.height(10.dp))
 
                 OutlinedTextField(
-                    label = { Text(text = "Birim Fiyat") },
+                    label = { Text(text = stringResource(R.string.unit_price)) },
                     value = price,
                     onValueChange = { price = it })
 
@@ -77,11 +88,23 @@ fun MinimalDialog(onDismissRequest: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     OutlinedButton(onClick = { onDismissRequest() }) {
-                        Text(text = "İptal")
+                        Text(text = stringResource(R.string.btn_cancel))
                     }
 
-                    OutlinedButton(onClick = { onDismissRequest() }) {
-                        Text(text = "Kaydet")
+                    OutlinedButton(onClick = {
+                        viewModel.onEvent(
+                            ShoppingListEvent.OnCreateItemClick(
+                                ShoppingItemCreateDTO(
+                                    itemName,
+                                    price.toFloat(),
+                                    amount.toInt(),
+                                    listId = listId
+                                )
+                            )
+                        )
+                        onDismissRequest()
+                    }) {
+                        Text(text = stringResource(R.string.btn_save))
                     }
                 }
             }
