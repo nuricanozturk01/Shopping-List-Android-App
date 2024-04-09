@@ -7,7 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.domain.dto.InfluxType
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow

@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.route
+package callofproject.dev.shoppinglistapp.util.route
 
 object Route {
     const val SHOPPING_LIST_ITEM = "shopping_list_item"

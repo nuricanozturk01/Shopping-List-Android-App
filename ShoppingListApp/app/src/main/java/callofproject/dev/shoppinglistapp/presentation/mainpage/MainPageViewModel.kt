@@ -5,18 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
-import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
-import callofproject.dev.shoppinglistapp.domain.use_case.StrLengthUseCase
+import callofproject.dev.shoppinglistapp.domain.use_case.ShoppingListAppUseCasesFacade
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnClickSaveListBtn
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnEditShoppingListClick
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnRefreshPage
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent.OnRemoveShoppingListClick
-import callofproject.dev.shoppinglistapp.route.UiEvent
-import callofproject.dev.shoppinglistapp.route.UiEvent.ShowSnackbar
-import callofproject.dev.shoppinglistapp.route.UiEvent.ShowToastMessage
-import callofproject.dev.shoppinglistapp.route.UiText.StringResource
 import callofproject.dev.shoppinglistapp.util.Resource
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent.ShowSnackbar
+import callofproject.dev.shoppinglistapp.util.route.UiEvent.ShowToastMessage
+import callofproject.dev.shoppinglistapp.util.route.UiText.StringResource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -30,8 +29,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainPageViewModel @Inject constructor(
-    private val mServiceHelper: ShoppingListServiceHelper,
-    private val mValidateString: StrLengthUseCase,
+    private val mUseCasesFacade: ShoppingListAppUseCasesFacade,
     private val mFormatter: DateTimeFormatter
 ) : ViewModel() {
 
@@ -57,13 +55,13 @@ class MainPageViewModel @Inject constructor(
     private fun updateShoppingList(shoppingList: ShoppingList, name: String) {
         viewModelScope.launch {
 
-            if (!mValidateString(name)) {
+            if (!mUseCasesFacade.stringValidator(name)) {
                 _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
                 return@launch
             }
 
             shoppingList.listName = name
-            mServiceHelper.updateShoppingList(shoppingList)
+            mUseCasesFacade.updateShoppingList(shoppingList)
 
             _state.value = state.value.copy(
                 shoppingLists = state.value.shoppingLists.map {
@@ -79,7 +77,7 @@ class MainPageViewModel @Inject constructor(
 
     private fun removeList(id: Long) {
         viewModelScope.launch {
-            val result = mServiceHelper.removeShoppingListById(id)
+            val result = mUseCasesFacade.removeShoppingList(id)
 
             if (!result) {
                 _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
@@ -97,12 +95,12 @@ class MainPageViewModel @Inject constructor(
     private fun saveShoppingList(name: String) {
         viewModelScope.launch {
 
-            if (!mValidateString(name)) {
+            if (!mUseCasesFacade.stringValidator(name)) {
                 _uiEvent.send(ShowToastMessage(StringResource(R.string.message_validate_str)))
                 return@launch
             }
 
-            val shoppingList = mServiceHelper.createShoppingList(name)
+            val shoppingList = mUseCasesFacade.createShoppingList(name)
 
             _state.value = state.value.copy(
                 shoppingLists = state.value.shoppingLists + shoppingList!!
@@ -115,7 +113,7 @@ class MainPageViewModel @Inject constructor(
     fun findAll() {
         findAllJob?.cancel()
         findAllJob = viewModelScope.launch {
-            mServiceHelper.findAllShoppingLists().onEach { result ->
+            mUseCasesFacade.findAllShoppingList().onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _state.value = _state.value.copy(

@@ -42,6 +42,8 @@
     <string name="edit_list">ListeDüzenle</string>
     <string name="x_listed_item">farklı ürün listelendi</string>
     <string name="change_lang">Dil</string>
+    <string name="tr">tr</string>
+    <string name="en">en</string>
 
 
 </resources>

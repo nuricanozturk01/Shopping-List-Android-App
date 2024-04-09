@@ -39,7 +39,7 @@ import callofproject.dev.shoppinglistapp.presentation.components.AlertDialog
 import callofproject.dev.shoppinglistapp.presentation.components.SummaryDisplay
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent.OnEditShoppingItem
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListViewModel
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 
 
 @Composable

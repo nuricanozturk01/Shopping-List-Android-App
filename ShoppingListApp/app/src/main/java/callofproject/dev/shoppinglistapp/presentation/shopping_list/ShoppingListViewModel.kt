@@ -5,14 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import callofproject.dev.shoppinglistapp.R
-import callofproject.dev.shoppinglistapp.data.dal.ShoppingListServiceHelper
 import callofproject.dev.shoppinglistapp.data.entity.ShoppingItem
 import callofproject.dev.shoppinglistapp.domain.dto.ShoppingItemCreateDTO
 import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
-import callofproject.dev.shoppinglistapp.domain.use_case.StrLengthUseCase
-import callofproject.dev.shoppinglistapp.route.UiEvent
-import callofproject.dev.shoppinglistapp.route.UiText
+import callofproject.dev.shoppinglistapp.domain.use_case.ShoppingListAppUseCasesFacade
 import callofproject.dev.shoppinglistapp.util.Resource
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
@@ -25,8 +24,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ShoppingListViewModel @Inject constructor(
-    private val mServiceHelper: ShoppingListServiceHelper,
-    val mValidateString: StrLengthUseCase,
+    private val mUsesCases: ShoppingListAppUseCasesFacade,
     mPreferences: IPreferences
 ) : ViewModel() {
 
@@ -67,7 +65,7 @@ class ShoppingListViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
 
-            if (!mValidateString(name)) {
+            if (!mUsesCases.stringValidator(name)) {
                 _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.message_validate_str)))
                 return@launch
             }
@@ -75,7 +73,7 @@ class ShoppingListViewModel @Inject constructor(
             item.itemName = name
             item.amount = amount.toInt()
             item.price = price.toFloat()
-            mServiceHelper.updateShoppingItem(item)
+            mUsesCases.updateShoppingItem(item)
 
             _state.value = state.value.copy(
                 shoppingItemList = state.value.shoppingItemList
@@ -96,7 +94,7 @@ class ShoppingListViewModel @Inject constructor(
 
     private fun removeItemById(itemId: Long) {
         viewModelScope.launch {
-            val result = mServiceHelper.removeShoppingItemById(itemId)
+            val result = mUsesCases.removeShoppingItem(itemId)
 
             if (!result) {
                 _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.info_list_removed_fail)))
@@ -114,12 +112,12 @@ class ShoppingListViewModel @Inject constructor(
     private fun createShoppingItem(dto: ShoppingItemCreateDTO) {
         viewModelScope.launch {
 
-            if (!mValidateString(dto.itemName)) {
+            if (!mUsesCases.stringValidator(dto.itemName)) {
                 _uiEvent.send(UiEvent.ShowToastMessage(UiText.StringResource(R.string.message_validate_str)))
                 return@launch
             }
 
-            val shoppingItem = mServiceHelper.createShoppingItem(dto)
+            val shoppingItem = mUsesCases.createShoppingItem(dto)
             updateShoppingList(shoppingItem!!.listId, 1)
 
             _state.value = state.value.copy(
@@ -132,12 +130,12 @@ class ShoppingListViewModel @Inject constructor(
 
     private fun updateShoppingList(listId: Long, counter: Int) {
         viewModelScope.launch {
-            val list = mServiceHelper.findShoppingListById(listId)
+            val list = mUsesCases.findShoppingListById(listId)
             if (counter > 0)
                 list!!.itemCount = list.itemCount + 1
             else list!!.itemCount = list.itemCount - 1
 
-            mServiceHelper.updateShoppingList(list)
+            mUsesCases.updateShoppingList(list)
         }
     }
 
@@ -153,7 +151,7 @@ class ShoppingListViewModel @Inject constructor(
     fun findAll(id: Long) {
         findAllJob?.cancel()
         findAllJob = viewModelScope.launch {
-            mServiceHelper.findAllShoppingItemsByListId(id).onEach { result ->
+            mUsesCases.findAllShoppingItems(id).onEach { result ->
                 when (result) {
                     is Resource.Loading -> {
                         _state.value = _state.value.copy(

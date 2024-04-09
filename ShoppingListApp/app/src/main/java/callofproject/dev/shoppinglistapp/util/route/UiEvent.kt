@@ -1,4 +1,4 @@
-package callofproject.dev.shoppinglistapp.route
+package callofproject.dev.shoppinglistapp.util.route
 
 sealed class UiEvent {
     data object Success: UiEvent()

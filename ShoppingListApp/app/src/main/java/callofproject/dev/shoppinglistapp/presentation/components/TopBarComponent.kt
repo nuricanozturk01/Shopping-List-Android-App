@@ -37,15 +37,12 @@ fun TopBarComponent(
     confirmEvent: (String) -> Unit,
     title: String = stringResource(R.string.default_title)
 ) {
-
-
+    val addListText = stringResource(R.string.create_list_menu)
     val expandedMenu = remember { mutableStateOf(false) }
     val createListScreenExpanded = remember { mutableStateOf(false) }
-    val changeLangScreenExpanded = remember { mutableStateOf(false) }
-    val menuItems = listOf(
-        Pair(stringResource(R.string.create_list_menu)) { createListScreenExpanded.value = true },
-        Pair(stringResource(R.string.change_lang)) { changeLangScreenExpanded.value = true }
-    )
+    val menuItems = remember {
+        mutableListOf(Pair(addListText) { createListScreenExpanded.value = true })
+    }
     TopAppBar(
         colors = TopAppBarColors(
             containerColor = MaterialTheme.colorScheme.inversePrimary,

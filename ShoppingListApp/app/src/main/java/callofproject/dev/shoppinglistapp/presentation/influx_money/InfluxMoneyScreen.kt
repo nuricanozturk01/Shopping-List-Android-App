@@ -23,7 +23,7 @@ import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.domain.dto.InfluxType
 import callofproject.dev.shoppinglistapp.presentation.components.ActionButton
 import callofproject.dev.shoppinglistapp.presentation.components.SelectableButton
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 
 @Composable
 fun InfluxMoneyScreen(

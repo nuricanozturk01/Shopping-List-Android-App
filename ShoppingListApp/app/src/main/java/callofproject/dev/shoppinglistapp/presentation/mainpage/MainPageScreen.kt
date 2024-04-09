@@ -25,7 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import callofproject.dev.shoppinglistapp.R
 import callofproject.dev.shoppinglistapp.presentation.components.TopBarComponent
 import callofproject.dev.shoppinglistapp.presentation.mainpage.components.ShoppingListItem
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 
 @Composable
 fun MainPageScreen(

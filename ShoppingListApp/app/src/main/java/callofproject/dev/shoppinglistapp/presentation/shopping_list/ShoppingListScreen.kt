@@ -46,7 +46,7 @@ import callofproject.dev.shoppinglistapp.presentation.components.TopBarComponent
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListEvent.OnRefreshPage
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemScreen
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.shopping_item.ShoppingItemUpsertScreen
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 
 @Composable
 fun ShoppingListScreen(

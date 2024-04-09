@@ -43,5 +43,7 @@
     <string name="edit_list">Edit List</string>
     <string name="x_listed_item">listed different products</string>
     <string name="change_lang">Language</string>
+    <string name="tr">tr</string>
+    <string name="en">en</string>
 
 </resources>

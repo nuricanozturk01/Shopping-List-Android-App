@@ -21,8 +21,8 @@ import callofproject.dev.shoppinglistapp.domain.preferences.IPreferences
 import callofproject.dev.shoppinglistapp.presentation.influx_money.InfluxMoneyScreen
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageScreen
 import callofproject.dev.shoppinglistapp.presentation.shopping_list.ShoppingListScreen
-import callofproject.dev.shoppinglistapp.route.Route
 import callofproject.dev.shoppinglistapp.ui.theme.ShoppingListAppTheme
+import callofproject.dev.shoppinglistapp.util.route.Route
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

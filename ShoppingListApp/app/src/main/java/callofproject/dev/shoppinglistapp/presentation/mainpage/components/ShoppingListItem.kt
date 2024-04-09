@@ -38,7 +38,7 @@ import callofproject.dev.shoppinglistapp.data.entity.ShoppingList
 import callofproject.dev.shoppinglistapp.presentation.components.AlertDialog
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageEvent
 import callofproject.dev.shoppinglistapp.presentation.mainpage.MainPageViewModel
-import callofproject.dev.shoppinglistapp.route.UiEvent
+import callofproject.dev.shoppinglistapp.util.route.UiEvent
 
 
 @Composable
